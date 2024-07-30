@@ -15,7 +15,7 @@ public class ContextDragonEcs : ContextBase
 	private EcsDefaultWorld? _world;
 
 	public ContextDragonEcs()
-		: base("DragonEcs") {}
+		: base("Dragon Ecs") {}
 
 	protected override void DoSetup()
 	{
