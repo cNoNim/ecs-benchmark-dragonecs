@@ -5,18 +5,15 @@
     "name": "cNoNim",
     "url": "https://github.com/cNoNim"
   },
-  "displayName": "ECS Benchmark DragonEcs",
-  "description": "ECS Benchmark DragonEcs",
+  "displayName": "ECS Benchmark Dragon Ecs",
+  "description": "ECS Benchmark Dragon Ecs",
   "unity": "2020.3",
   "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/cNoNim/ecs-benchmark-dragonecs.git"
   },
-  "dependencies": {
-    "ecs.benchmark.core": "1.0.0",
-    "com.dcfa_pixels.dragonecs": "0.8.39"
-  },
+  "dependencies": {},
   "keywords":
   [
     "ecs",
