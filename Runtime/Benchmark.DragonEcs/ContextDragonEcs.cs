@@ -1,6 +1,7 @@
 using System;
 using System.Buffers;
 using Benchmark.Core;
+using Benchmark.Core.Algorithms;
 using Benchmark.Core.Components;
 using Benchmark.Core.Random;
 using DCFApixels.DragonECS;
@@ -218,34 +219,31 @@ public class ContextDragonEcs : ContextBase
 
 		public void Run()
 		{
-			var entities = _world.Where(out Aspect a);
-			var count    = entities.Count;
-			var keys     = ArrayPool<ulong>.Shared.Rent(count);
-			var targets  = ArrayPool<Target<int>>.Shared.Rent(count);
+			var entities    = _world.Where(out Aspect a);
+			var count       = entities.Count;
+			var keys        = ArrayPool<uint>.Shared.Rent(count);
+			var indirection = ArrayPool<int>.Shared.Rent(count);
+			var targets     = ArrayPool<Target<int>>.Shared.Rent(count);
 			FillTargets(
 				entities,
 				a,
 				keys,
 				targets);
-			Array.Sort(
-				keys,
-				targets,
-				0,
-				count);
+			RadixSort.SortWithIndirection(keys, indirection, count);
 			CreateAttacks(
 				entities,
 				a,
-				targets,
-				count);
-			ArrayPool<ulong>.Shared.Return(keys);
+				indirection,
+				targets.AsSpan(0, count));
+			ArrayPool<uint>.Shared.Return(keys);
 			ArrayPool<Target<int>>.Shared.Return(targets);
 		}
 
 		private static void FillTargets(
 			EcsSpan entities,
 			Aspect a,
-			ulong[] keys,
-			Target<int>[] targets)
+			Span<uint> keys,
+			Span<Target<int>> targets)
 		{
 			var i = 0;
 			foreach (var entity in entities)
@@ -263,9 +261,10 @@ public class ContextDragonEcs : ContextBase
 		private void CreateAttacks(
 			EcsSpan entities,
 			Aspect a,
-			Target<int>[] targets,
-			int count)
+			ReadOnlySpan<int> indirection,
+			ReadOnlySpan<Target<int>> targets)
 		{
+			var count = targets.Length;
 			foreach (var entity in entities)
 			{
 				ref readonly var damage = ref a.Damages.Get(entity)
@@ -285,7 +284,7 @@ public class ContextDragonEcs : ContextBase
 												 .V;
 				var generator    = new RandomGenerator(unit.Seed);
 				var index        = generator.Random(ref unit.Counter, count);
-				var target       = targets[index];
+				var target       = targets[indirection[index]];
 				var attackEntity = _world.NewEntity();
 				a.Attacks.Add(attackEntity) = new AttackEntity
 				{
