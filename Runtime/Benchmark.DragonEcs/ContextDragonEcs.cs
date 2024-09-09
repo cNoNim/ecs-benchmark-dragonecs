@@ -230,12 +230,13 @@ public class ContextDragonEcs : ContextBase
 				keys,
 				targets);
 			RadixSort.SortWithIndirection(keys, indirection, count);
+			ArrayPool<uint>.Shared.Return(keys);
 			CreateAttacks(
 				entities,
 				a,
 				indirection,
 				targets.AsSpan(0, count));
-			ArrayPool<uint>.Shared.Return(keys);
+			ArrayPool<int>.Shared.Return(indirection);
 			ArrayPool<Target<int>>.Shared.Return(targets);
 		}
 
