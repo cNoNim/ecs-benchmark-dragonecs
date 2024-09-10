@@ -20,7 +20,13 @@ public class ContextDragonEcs : ContextBase
 
 	protected override void DoSetup()
 	{
-		var world = _world = new EcsDefaultWorld();
+		var world = _world = new EcsDefaultWorld(
+			new EcsWorldConfig(
+				entitiesCapacity: EntityCount,
+				poolsCapacity: 16,
+				poolComponentsCapacity: EntityCount,
+				poolRecycledComponentsCapacity: EntityCount / 2,
+				groupCapacity: EntityCount));
 
 		_pipeline = EcsPipeline.New()
 							   .Add(new SpawnSystem())
