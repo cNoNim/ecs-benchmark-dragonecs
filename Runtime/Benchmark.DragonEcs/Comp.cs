@@ -68,11 +68,19 @@ public struct CompDamage : IEcsComponent
 		new() { V = value };
 }
 
-public struct AttackEntity : IEcsComponent
+public struct AttackEntity
+	: IEcsComponent,
+	  IAttack
 {
 	public entlong Target;
 	public int     Damage;
 	public int     Ticks;
+
+	int IAttack.Damage
+	{
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		get => Damage;
+	}
 }
 
 }

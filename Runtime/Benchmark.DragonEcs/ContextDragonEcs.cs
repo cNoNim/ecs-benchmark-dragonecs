@@ -332,21 +332,16 @@ public class ContextDragonEcs : ContextBase
 				if (attack.Ticks-- > 0)
 					continue;
 
-				var target       = attack.Target;
-				var attackDamage = attack.Damage;
-
+				if (attack.Target.TryGetID(out var targetEntity)
+				 && group.Has(targetEntity))
+				{
+					ref var health = ref a.Healths.Get(targetEntity)
+										  .V;
+					ref var damage = ref a.Damages.Get(targetEntity)
+										  .V;
+					ApplyDamageSequential(ref health, in damage, in attack);
+				}
 				_world.DelEntity(entity);
-
-				if (!target.TryGetID(out var targetEntity)
-				 || !group.Has(targetEntity))
-					continue;
-
-				ref var health = ref a.Healths.Get(targetEntity)
-									  .V;
-				ref readonly var damage = ref a.Damages.Get(targetEntity)
-											   .V;
-				var totalDamage = attackDamage - damage.Defence;
-				health.Hp -= totalDamage;
 			}
 		}
 
